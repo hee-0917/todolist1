@@ -1104,8 +1104,14 @@
                 const data = snapshot.val();
                 if (data) {
                     tasks = data;
-                    renderTasks();
+                } else {
+                    tasks = {
+                        todo: [],
+                        progress: [],
+                        done: []
+                    };
                 }
+                renderTasks();
             });
         }
 
@@ -1238,32 +1244,144 @@
 
         // 메모 관련 함수들 수정
         function toggleMemo(id, status) {
-            const task = tasks[status].find(task => task.id === id);
-            task.showMemo = !task.showMemo;
-            renderTasks();
+            console.log('Toggle memo:', id, status);
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                tasks[status][taskIndex].showMemo = !tasks[status][taskIndex].showMemo;
+                renderTasks();
+            }
         }
 
         function saveMemo(id, status) {
-            const task = tasks[status].find(task => task.id === id);
-            const memoInput = document.getElementById(`memo-${id}`);
-            task.memo = memoInput.value.trim();
-            task.showMemo = false;  // 저장 후 메모 입력창 닫기
-            saveTasks();
-            renderTasks();
+            console.log('Save memo:', id, status);
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                const memoInput = document.getElementById(`memo-${id}`);
+                if (memoInput) {
+                    tasks[status][taskIndex].memo = memoInput.value.trim();
+                    tasks[status][taskIndex].showMemo = false;
+                    saveTasks();
+                }
+            }
         }
 
         function cancelMemo(id, status) {
-            const task = tasks[status].find(task => task.id === id);
-            task.showMemo = false;  // 메모 입력창 닫기
-            renderTasks();
+            console.log('Cancel memo:', id, status);
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                tasks[status][taskIndex].showMemo = false;
+                renderTasks();
+            }
         }
 
-        // Enter 키로 태스크 추가
-        document.getElementById('todoInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addTask('todo');
+        // 새로운 태스크 추가
+        function addTask(status) {
+            const input = document.getElementById('todoInput');
+            const dateInput = document.getElementById('todoDate');
+            const text = input.value.trim();
+            const dueDate = dateInput.value;
+            
+            if (text) {
+                const task = {
+                    id: Date.now(),
+                    text: text,
+                    memo: '',
+                    showMemo: false,
+                    dueDate: dueDate
+                };
+                
+                if (!tasks[status]) {
+                    tasks[status] = [];
+                }
+                
+                tasks[status].push(task);
+                saveTasks();
+                input.value = '';
+                dateInput.value = '';
             }
-        });
+        }
+
+        // Firebase에 저장
+        function saveTasks() {
+            const tasksRef = window.dbRef(window.db, 'tasks');
+            window.dbSet(tasksRef, tasks)
+                .then(() => {
+                    console.log("Tasks saved successfully");
+                    renderTasks();
+                })
+                .catch((error) => {
+                    console.error("Error saving tasks:", error);
+                    alert("저장 중 오류가 발생했습니다.");
+                });
+        }
+
+        // 태스크 이동
+        function moveTask(id, fromStatus, toStatus) {
+            console.log('Move task:', id, fromStatus, toStatus);
+            const taskIndex = tasks[fromStatus].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                const task = tasks[fromStatus][taskIndex];
+                tasks[fromStatus].splice(taskIndex, 1);
+                if (!tasks[toStatus]) {
+                    tasks[toStatus] = [];
+                }
+                tasks[toStatus].push(task);
+                saveTasks();
+            }
+        }
+
+        // 태스크 수정
+        function editTask(id, status) {
+            console.log('Edit task:', id, status);
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                const task = tasks[status][taskIndex];
+                const newText = prompt('업무 내용을 수정하세요:', task.text);
+                if (newText && newText.trim()) {
+                    task.text = newText.trim();
+                    saveTasks();
+                }
+            }
+        }
+
+        // 태스크 삭제
+        function deleteTask(id, status) {
+            console.log('Delete task:', id, status);
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                tasks[status].splice(taskIndex, 1);
+                saveTasks();
+            }
+        }
+
+        // 로그인 상태 확인
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn) {
+                showLoginModal();
+            } else {
+                hideLoginModal();
+                showMainContent();
+            }
+        }
+
+        // 로그인 모달 표시
+        function showLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = 'block';
+            document.querySelector('.container').style.display = 'none';
+        }
+
+        // 로그인 모달 숨기기
+        function hideLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.style.display = 'none';
+        }
+
+        // 메인 컨텐츠 표시
+        function showMainContent() {
+            document.querySelector('.container').style.display = 'block';
+        }
 
         // 비밀번호 변경 관련 함수들
         function showPasswordChangeModal() {
@@ -1359,9 +1477,20 @@
             }
         }
 
-        // 페이지 로드 시 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            setupPasswordChangeListeners();
+        // 페이지 로드 시 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', () => {
+            // 로그인 상태 확인
+            checkLoginStatus();
+            
+            // Enter 키로 태스크 추가
+            document.getElementById('todoInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTask('todo');
+                }
+            });
+
+            // Firebase에서 데이터 로드
+            loadTasks();
         });
     </script>
 </body>
