@@ -232,12 +232,14 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
@@ -728,9 +730,9 @@
         /* 로그인 버튼 기본 스타일 */
         .login-btn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 500;
             color: white;
@@ -739,22 +741,168 @@
             transition: all 0.3s ease;
         }
 
-        /* 비활성화된 로그인 버튼 */
         .login-btn:disabled {
             background-color: #cccccc !important;
             cursor: not-allowed;
             opacity: 0.7;
         }
 
-        /* 활성화된 로그인 버튼 */
-        .login-btn:enabled {
-            background-color: #2980b9;
-            opacity: 1;
+        .login-btn:not(:disabled):hover {
+            background-color: #2471a3;
         }
 
-        /* 활성화된 로그인 버튼 호버 효과 */
-        .login-btn:enabled:hover {
+        /* 모달 스타일 수정 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+        }
+
+        /* 비밀번호 변경 모달 스타일 */
+        .password-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1100;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .password-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .password-modal .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .password-modal .close {
+            font-size: 24px;
+            color: #777;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .password-modal input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            -webkit-appearance: none; /* iOS 기본 스타일 제거 */
+            appearance: none;
+        }
+
+        .password-modal input:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+        }
+
+        .password-modal button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent; /* 모바일 터치 하이라이트 제거 */
+        }
+
+        .password-modal button:hover {
             background-color: #2471a3;
+        }
+
+        /* 비밀번호 변경 버튼 스타일 */
+        .change-password-btn {
+            position: fixed;
+            top: 20px;
+            right: 120px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .change-password-btn:hover {
+            background-color: #2471a3;
+        }
+
+        /* 모바일 대응 스타일 */
+        @media screen and (max-width: 768px) {
+            .password-modal {
+                width: 85%;
+                padding: 15px;
+            }
+
+            .password-modal input {
+                font-size: 16px; /* iOS에서 자동 확대 방지 */
+                padding: 12px;
+            }
+
+            .change-password-btn {
+                top: 10px;
+                right: 70px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            /* 상단 버튼 간격 조정 */
+            .logout-btn {
+                top: 10px;
+                right: 10px;
+            }
+
+            /* 모달 내부 여백 조정 */
+            .modal-header {
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+            }
+
+            .modal-body {
+                padding: 0 5px;
+            }
+
+            /* 터치 영역 최적화 */
+            button {
+                min-height: 44px; /* iOS 권장 최소 터치 영역 */
+            }
+        }
+
+        /* 안전한 영역 확보 */
+        @supports (padding: max(0px)) {
+            .password-modal {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
         }
     </style>
     <!-- Firebase SDK -->
@@ -842,31 +990,28 @@
             <div style="padding: 20px;">
                 <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" 
                        style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
-                <button id="loginButton" onclick="login()" class="login-btn" disabled>로그인</button>
+                <button id="loginButton" onclick="login()" class="login-btn" disabled 
+                        style="width: 100%; padding: 10px; background-color: #cccccc; color: white; 
+                        border: none; border-radius: 4px; cursor: not-allowed; opacity: 0.7;">로그인</button>
             </div>
         </div>
     </div>
 
     <!-- 비밀번호 변경 버튼 -->
-    <button onclick="showChangePassword()" style="position: fixed; top: 20px; right: 120px; 
-            background-color: #2980b9; color: white; border: none; padding: 8px 15px; 
-            border-radius: 4px; cursor: pointer;">비밀번호 변경</button>
+    <button onclick="showChangePassword()" class="change-password-btn">비밀번호 변경</button>
 
     <!-- 비밀번호 변경 모달 -->
     <div id="changePasswordModal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="password-modal">
             <div class="modal-header">
                 <h3>비밀번호 변경</h3>
                 <span class="close" onclick="closeChangePassword()">&times;</span>
             </div>
-            <div style="padding: 20px;">
-                <input type="password" id="currentPassword" placeholder="현재 비밀번호" 
-                       style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                <input type="password" id="newPassword" placeholder="새 비밀번호" 
-                       style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                <input type="password" id="confirmPassword" placeholder="새 비밀번호 확인" 
-                       style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
-                <button onclick="changePassword()" class="add-btn" style="width: 100%;">변경하기</button>
+            <div class="modal-body">
+                <input type="password" id="currentPassword" placeholder="현재 비밀번호">
+                <input type="password" id="newPassword" placeholder="새 비밀번호">
+                <input type="password" id="confirmPassword" placeholder="새 비밀번호 확인">
+                <button onclick="changePassword()" id="changePasswordButton" disabled>변경하기</button>
             </div>
         </div>
     </div>
@@ -897,32 +1042,19 @@
 
         // 로그인 처리
         function login() {
-            const passwordInput = document.getElementById('passwordInput');
-            const password = passwordInput.value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const correctPassword = "1234"; // 설정된 비밀번호
             
-            if (password.length === 0) {
-                alert('비밀번호를 입력해주세요.');
-                return;
+            if (password === correctPassword) {
+                localStorage.setItem('isLoggedIn', 'true');
+                document.getElementById('loginModal').style.display = 'none';
+                document.querySelector('.container').style.display = 'block';
+                loadTasks();
+            } else {
+                alert('비밀번호가 올바르지 않습니다.');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('loginButton').disabled = true;
             }
-
-            const passwordRef = window.dbRef(window.db, 'password');
-            
-            window.dbGet(passwordRef).then((snapshot) => {
-                const correctPassword = snapshot.val();
-                if (password === correctPassword) {
-                    localStorage.setItem('isLoggedIn', 'true');
-                    document.getElementById('loginModal').style.display = 'none';
-                    document.querySelector('.container').style.display = 'block';
-                    loadTasks();
-                    // 입력 필드 초기화
-                    passwordInput.value = '';
-                } else {
-                    alert('비밀번호가 올바르지 않습니다.');
-                    passwordInput.value = '';
-                    document.getElementById('loginButton').disabled = true;
-                    passwordInput.focus();
-                }
-            });
         }
 
         // 로그아웃
@@ -1188,29 +1320,60 @@
             }
         });
 
-        // Firebase에 비밀번호 저장
-        function initializePassword() {
-            const passwordRef = window.dbRef(window.db, 'password');
-            window.dbGet(passwordRef).then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // 초기 비밀번호 설정 (1234)
-                    window.dbSet(passwordRef, "1234");
-                }
+        // 비밀번호 변경 입력 감지 및 버튼 활성화 처리
+        function initializePasswordChangeModal() {
+            const inputs = [
+                document.getElementById('currentPassword'),
+                document.getElementById('newPassword'),
+                document.getElementById('confirmPassword')
+            ];
+            const changePasswordButton = document.getElementById('changePasswordButton');
+
+            function checkInputs() {
+                const allFilled = inputs.every(input => input.value.trim().length > 0);
+                changePasswordButton.disabled = !allFilled;
+                changePasswordButton.style.backgroundColor = allFilled ? '#2980b9' : '#cccccc';
+                changePasswordButton.style.opacity = allFilled ? '1' : '0.7';
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', checkInputs);
+                
+                // 모바일에서 입력 필드 포커스 시 화면 조정
+                input.addEventListener('focus', function() {
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
             });
         }
 
         // 비밀번호 변경 모달 표시
         function showChangePassword() {
-            document.getElementById('changePasswordModal').style.display = 'block';
-        }
-
-        // 비밀번호 변경 모달 닫기
-        function closeChangePassword() {
-            document.getElementById('changePasswordModal').style.display = 'none';
+            const modal = document.getElementById('changePasswordModal');
+            modal.style.display = 'block';
+            
             // 입력 필드 초기화
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
+            document.getElementById('changePasswordButton').disabled = true;
+            
+            // 모달 초기화
+            initializePasswordChangeModal();
+        }
+
+        // 비밀번호 변경 모달 닫기
+        function closeChangePassword() {
+            const modal = document.getElementById('changePasswordModal');
+            modal.style.display = 'none';
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeChangePassword();
+            }
         }
 
         // 비밀번호 변경
@@ -1263,20 +1426,29 @@
             });
         });
 
-        // 비밀번호 입력 감지 및 버튼 활성화 처리
-        document.addEventListener('DOMContentLoaded', () => {
+        // DOM이 로드된 후 실행될 초기화 코드
+        document.addEventListener('DOMContentLoaded', function() {
+            // 비밀번호 입력 필드와 로그인 버튼 요소 가져오기
             const passwordInput = document.getElementById('passwordInput');
             const loginButton = document.getElementById('loginButton');
 
-            // 비밀번호 입력 감지
+            // 비밀번호 입력 감지 이벤트
             passwordInput.addEventListener('input', function() {
                 const password = this.value.trim();
-                loginButton.disabled = password.length === 0;
+                if (password.length > 0) {
+                    loginButton.disabled = false;
+                    loginButton.style.backgroundColor = '#2980b9';
+                    loginButton.style.opacity = '1';
+                } else {
+                    loginButton.disabled = true;
+                    loginButton.style.backgroundColor = '#cccccc';
+                    loginButton.style.opacity = '0.7';
+                }
             });
 
-            // Enter 키 이벤트는 비밀번호가 입력된 경우에만 동작
-            passwordInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && passwordInput.value.trim().length > 0) {
+            // Enter 키 이벤트
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !loginButton.disabled) {
                     login();
                 }
             });
