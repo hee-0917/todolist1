@@ -277,9 +277,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
+            padding-bottom: 15px;
             margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
+            border-bottom: 1px solid #eee;
         }
 
         .print-btn {
@@ -818,6 +818,69 @@
                 opacity: 1;
             }
         }
+
+        /* 비밀번호 변경 모달 스타일 수정 */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .password-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .change-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            background-color: #2980b9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .change-btn:disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .modal-footer {
+            text-align: center;
+            padding-top: 20px;
+        }
     </style>
     <!-- Firebase SDK -->
     <script type="module">
@@ -910,7 +973,6 @@
 
     <!-- 비밀번호 변경 모달 -->
     <div id="passwordChangeModal" class="modal">
-        <div class="modal-overlay" onclick="closePasswordChangeModal()"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h3>비밀번호 변경</h3>
@@ -1206,34 +1268,100 @@
         // 비밀번호 변경 관련 함수들
         function showPasswordChangeModal() {
             const modal = document.getElementById('passwordChangeModal');
-            modal.style.display = 'flex';  // flex로 변경하여 중앙 정렬
-            setTimeout(() => modal.classList.add('show'), 10);
+            modal.style.display = 'block';
             
-            // 모달이 열릴 때 body 스크롤 방지
-            document.body.style.overflow = 'hidden';
+            // 입력 필드 초기화
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            // 버튼 초기 상태 설정
+            const changeButton = document.getElementById('changePasswordButton');
+            changeButton.style.backgroundColor = '#2980b9';
+            changeButton.style.opacity = '1';
+            
+            // 입력 필드 이벤트 리스너 설정
+            setupPasswordChangeListeners();
+        }
+
+        function setupPasswordChangeListeners() {
+            const currentPassword = document.getElementById('currentPassword');
+            const newPassword = document.getElementById('newPassword');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const changeButton = document.getElementById('changePasswordButton');
+            
+            // 실시간 입력 감지
+            const checkInputs = () => {
+                const current = currentPassword.value.trim();
+                const newPw = newPassword.value.trim();
+                const confirm = confirmPassword.value.trim();
+                
+                // 모든 필드가 채워져 있고, 새 비밀번호와 확인이 일치하는지 확인
+                const isValid = current.length > 0 && newPw.length > 0 && confirm.length > 0;
+                
+                if (isValid) {
+                    changeButton.style.backgroundColor = '#2980b9';
+                    changeButton.style.opacity = '1';
+                    changeButton.style.cursor = 'pointer';
+                } else {
+                    changeButton.style.backgroundColor = '#cccccc';
+                    changeButton.style.opacity = '0.7';
+                    changeButton.style.cursor = 'not-allowed';
+                }
+            };
+
+            // 각 입력 필드에 이벤트 리스너 추가
+            [currentPassword, newPassword, confirmPassword].forEach(input => {
+                // 기존 이벤트 리스너 제거
+                input.removeEventListener('input', checkInputs);
+                input.removeEventListener('keyup', checkInputs);
+                
+                // 새 이벤트 리스너 추가
+                input.addEventListener('input', checkInputs);
+                input.addEventListener('keyup', checkInputs);
+            });
+        }
+
+        function handlePasswordChange() {
+            const currentPassword = document.getElementById('currentPassword').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            
+            // 현재 비밀번호 확인
+            const correctPassword = localStorage.getItem('password') || "1234";
+            
+            if (currentPassword !== correctPassword) {
+                alert('현재 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('새 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            // 비밀번호 변경 저장
+            localStorage.setItem('password', newPassword);
+            alert('비밀번호가 성공적으로 변경되었습니다.');
+            closePasswordChangeModal();
         }
 
         function closePasswordChangeModal() {
             const modal = document.getElementById('passwordChangeModal');
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.body.style.overflow = ''; // 스크롤 복원
-            }, 300);
+            modal.style.display = 'none';
         }
 
         // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordChangeModal');
+            if (event.target === modal) {
+                closePasswordChangeModal();
+            }
+        }
+
+        // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal')) {
-                        if (modal.id === 'passwordChangeModal') {
-                            closePasswordChangeModal();
-                        }
-                    }
-                });
-            });
+            setupPasswordChangeListeners();
         });
     </script>
 </body>
