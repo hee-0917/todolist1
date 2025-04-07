@@ -564,6 +564,62 @@
                 box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
             }
         }
+
+        /* 상단 버튼 컨테이너 스타일 수정 */
+        .top-buttons {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        /* 상단 버튼 스타일 */
+        .change-password-btn,
+        .logout-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .change-password-btn {
+            background-color: #2980b9; /* 파란색 */
+        }
+
+        .change-password-btn:hover {
+            background-color: #2471a3;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c; /* 붉은색 */
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .top-buttons {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                flex-direction: column;
+            }
+
+            .change-password-btn,
+            .logout-btn {
+                padding: 10px 20px;
+                font-size: 16px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+        }
     </style>
     <!-- Firebase SDK -->
     <script type="module">
