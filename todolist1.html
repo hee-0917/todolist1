@@ -500,6 +500,8 @@
             -moz-appearance: none;
             appearance: none;
             background-color: white;
+            z-index: 1000;
+            position: relative;
         }
 
         .memo-text {
@@ -532,25 +534,13 @@
                 font-size: 16px;
                 padding: 12px;
                 min-height: 120px;
+                -webkit-user-select: text;
+                user-select: text;
             }
-
+            
             .memo-container {
-                padding: 15px;
-                margin-top: 12px;
-            }
-
-            .memo-actions {
-                display: flex;
-                gap: 10px;
-                justify-content: flex-end;
-                margin-top: 10px;
-            }
-
-            .memo-actions button {
-                padding: 10px 20px;
-                font-size: 14px;
-                height: 40px;
-                min-width: 80px;
+                position: relative;
+                z-index: 1000;
             }
         }
 
@@ -1315,22 +1305,24 @@
                 tasks[status][taskIndex].showMemo = !tasks[status][taskIndex].showMemo;
                 renderTasks();
                 
-                // 메모창이 열린 후 textarea에 포커스 주기
                 if (tasks[status][taskIndex].showMemo) {
                     setTimeout(() => {
                         const memoInput = document.getElementById(`memo-${id}`);
                         if (memoInput) {
-                            // 모바일에서 키보드가 유지되도록 설정
-                            memoInput.addEventListener('focus', function() {
-                                this.style.height = '150px'; // 입력창 높이 조정
+                            // 이벤트 버블링 방지
+                            memoInput.addEventListener('click', (e) => {
+                                e.stopPropagation();
                             });
-                            memoInput.addEventListener('blur', function() {
-                                // 포커스가 빠져나가도 키보드가 유지되도록
-                                setTimeout(() => this.focus(), 100);
-                            });
+                            
+                            // 모바일 키보드 강제 표시
+                            memoInput.readOnly = false;
                             memoInput.focus();
+                            
+                            // 커서를 텍스트 끝으로 이동
+                            const length = memoInput.value.length;
+                            memoInput.setSelectionRange(length, length);
                         }
-                    }, 300);
+                    }, 300); // 시간을 좀 더 늘림
                 }
             }
         }
@@ -1341,9 +1333,22 @@
             if (taskIndex !== -1) {
                 const memoInput = document.getElementById(`memo-${id}`);
                 if (memoInput) {
-                    tasks[status][taskIndex].memo = memoInput.value.trim();
+                    const memoText = memoInput.value.trim();
+                    tasks[status][taskIndex].memo = memoText;
                     tasks[status][taskIndex].showMemo = false;
-                    saveTasks();
+                    
+                    // Firebase 저장 시도
+                    saveTasks()
+                        .then(() => {
+                            console.log('메모가 성공적으로 저장되었습니다.');
+                            renderTasks();
+                        })
+                        .catch((error) => {
+                            console.error('메모 저장 중 오류 발생:', error);
+                            // 로컬 스토리지에 백업
+                            localStorage.setItem('tasks', JSON.stringify(tasks));
+                            renderTasks();
+                        });
                 }
             }
         }
