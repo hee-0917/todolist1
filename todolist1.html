@@ -494,6 +494,9 @@
             font-size: 14px;
             resize: vertical;
             margin-bottom: 8px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         .memo-text {
@@ -523,8 +526,9 @@
         /* 모바일 대응 */
         @media (max-width: 768px) {
             .memo-input {
-                font-size: 16px;  /* 모바일에서 입력이 더 쉽도록 */
+                font-size: 16px;
                 padding: 10px;
+                min-height: 80px; /* 모바일에서 더 큰 입력 영역 */
             }
 
             .memo-actions button {
@@ -1099,20 +1103,51 @@
 
         // 데이터 로드 함수
         function loadTasks() {
-            const tasksRef = window.dbRef(window.db, 'tasks');
-            window.dbOnValue(tasksRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    tasks = data;
-                } else {
-                    tasks = {
-                        todo: [],
-                        progress: [],
-                        done: []
-                    };
+            try {
+                if (!window.db || !window.dbRef) {
+                    console.error("Firebase가 초기화되지 않았습니다.");
+                    // 로컬 스토리지에서 데이터 로드
+                    const localTasks = localStorage.getItem('tasks');
+                    if (localTasks) {
+                        tasks = JSON.parse(localTasks);
+                    }
+                    renderTasks();
+                    return;
+                }
+
+                const tasksRef = window.dbRef(window.db, 'tasks');
+                window.dbOnValue(tasksRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        tasks = data;
+                    } else {
+                        tasks = {
+                            todo: [],
+                            progress: [],
+                            done: []
+                        };
+                    }
+                    // 로컬 스토리지에도 백업
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    renderTasks();
+                }, (error) => {
+                    console.error("Firebase 데이터 로드 오류:", error);
+                    // 오류 발생 시 로컬 스토리지에서 데이터 로드
+                    const localTasks = localStorage.getItem('tasks');
+                    if (localTasks) {
+                        tasks = JSON.parse(localTasks);
+                    }
+                    renderTasks();
+                });
+            } catch (error) {
+                console.error("데이터 로드 중 오류 발생:", error);
+                // 오류 발생 시 로컬 스토리지에서 데이터 로드
+                const localTasks = localStorage.getItem('tasks');
+                if (localTasks) {
+                    tasks = JSON.parse(localTasks);
                 }
                 renderTasks();
-            });
+            }
         }
 
         // 태스크 렌더링
@@ -1181,7 +1216,11 @@
                     </div>
                     <div class="memo-container" style="display: ${task.showMemo ? 'block' : 'none'}">
                         <textarea class="memo-input" id="memo-${task.id}" 
-                            placeholder="메모를 입력하세요">${task.memo || ''}</textarea>
+                            placeholder="메모를 입력하세요"
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false">${task.memo || ''}</textarea>
                         <div class="memo-actions">
                             <button class="memo-cancel-btn" onclick="cancelMemo(${task.id}, '${status}')">취소</button>
                             <button class="memo-save-btn" onclick="saveMemo(${task.id}, '${status}')">저장</button>
@@ -1249,6 +1288,17 @@
             if (taskIndex !== -1) {
                 tasks[status][taskIndex].showMemo = !tasks[status][taskIndex].showMemo;
                 renderTasks();
+                
+                // 메모창이 열린 후 textarea에 포커스 주기
+                setTimeout(() => {
+                    const memoInput = document.getElementById(`memo-${id}`);
+                    if (memoInput && tasks[status][taskIndex].showMemo) {
+                        memoInput.focus();
+                        // 커서를 텍스트 끝으로 이동
+                        const length = memoInput.value.length;
+                        memoInput.setSelectionRange(length, length);
+                    }
+                }, 100);
             }
         }
 
@@ -1303,16 +1353,33 @@
 
         // Firebase에 저장
         function saveTasks() {
-            const tasksRef = window.dbRef(window.db, 'tasks');
-            window.dbSet(tasksRef, tasks)
-                .then(() => {
-                    console.log("Tasks saved successfully");
+            try {
+                // Firebase 연결 확인
+                if (!window.db || !window.dbRef) {
+                    console.error("Firebase가 초기화되지 않았습니다.");
+                    localStorage.setItem('tasks', JSON.stringify(tasks)); // 로컬 스토리지에 임시 저장
                     renderTasks();
-                })
-                .catch((error) => {
-                    console.error("Error saving tasks:", error);
-                    alert("저장 중 오류가 발생했습니다.");
-                });
+                    return;
+                }
+
+                const tasksRef = window.dbRef(window.db, 'tasks');
+                window.dbSet(tasksRef, tasks)
+                    .then(() => {
+                        console.log("Firebase에 성공적으로 저장되었습니다.");
+                        renderTasks();
+                    })
+                    .catch((error) => {
+                        console.error("Firebase 저장 오류:", error);
+                        // Firebase 저장 실패 시 로컬 스토리지에 백업
+                        localStorage.setItem('tasks', JSON.stringify(tasks));
+                        renderTasks();
+                    });
+            } catch (error) {
+                console.error("저장 중 오류 발생:", error);
+                // 오류 발생 시 로컬 스토리지에 백업
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                renderTasks();
+            }
         }
 
         // 태스크 이동
