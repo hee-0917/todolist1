@@ -483,20 +483,23 @@
             background-color: #f8f9fa;
             padding: 10px;
             border-radius: 4px;
+            position: relative;
+            z-index: 100;
         }
 
         .memo-input {
             width: 100%;
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            min-height: 60px;
-            font-size: 14px;
+            min-height: 100px;
+            font-size: 16px;
             resize: vertical;
             margin-bottom: 8px;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            background-color: white;
         }
 
         .memo-text {
@@ -527,13 +530,27 @@
         @media (max-width: 768px) {
             .memo-input {
                 font-size: 16px;
-                padding: 10px;
-                min-height: 80px; /* 모바일에서 더 큰 입력 영역 */
+                padding: 12px;
+                min-height: 120px;
+            }
+
+            .memo-container {
+                padding: 15px;
+                margin-top: 12px;
+            }
+
+            .memo-actions {
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+                margin-top: 10px;
             }
 
             .memo-actions button {
-                padding: 8px 12px;
+                padding: 10px 20px;
                 font-size: 14px;
+                height: 40px;
+                min-width: 80px;
             }
         }
 
@@ -885,6 +902,13 @@
             text-align: center;
             padding-top: 20px;
         }
+
+        /* 터치 이벤트 최적화 */
+        .memo-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
     </style>
     <!-- Firebase SDK -->
     <script type="module">
@@ -1214,13 +1238,15 @@
                         <button class="delete-btn" onclick="deleteTask(${task.id}, '${status}')">삭제</button>
                         ${moveButtons}
                     </div>
-                    <div class="memo-container" style="display: ${task.showMemo ? 'block' : 'none'}">
+                    <div class="memo-container" style="display: ${task.showMemo ? 'block' : 'none'}" onclick="event.stopPropagation()">
                         <textarea class="memo-input" id="memo-${task.id}" 
                             placeholder="메모를 입력하세요"
                             autocomplete="off"
                             autocorrect="off"
                             autocapitalize="off"
-                            spellcheck="false">${task.memo || ''}</textarea>
+                            spellcheck="false"
+                            style="height: auto;"
+                            ontouchstart="event.stopPropagation()">${task.memo || ''}</textarea>
                         <div class="memo-actions">
                             <button class="memo-cancel-btn" onclick="cancelMemo(${task.id}, '${status}')">취소</button>
                             <button class="memo-save-btn" onclick="saveMemo(${task.id}, '${status}')">저장</button>
@@ -1290,15 +1316,22 @@
                 renderTasks();
                 
                 // 메모창이 열린 후 textarea에 포커스 주기
-                setTimeout(() => {
-                    const memoInput = document.getElementById(`memo-${id}`);
-                    if (memoInput && tasks[status][taskIndex].showMemo) {
-                        memoInput.focus();
-                        // 커서를 텍스트 끝으로 이동
-                        const length = memoInput.value.length;
-                        memoInput.setSelectionRange(length, length);
-                    }
-                }, 100);
+                if (tasks[status][taskIndex].showMemo) {
+                    setTimeout(() => {
+                        const memoInput = document.getElementById(`memo-${id}`);
+                        if (memoInput) {
+                            // 모바일에서 키보드가 유지되도록 설정
+                            memoInput.addEventListener('focus', function() {
+                                this.style.height = '150px'; // 입력창 높이 조정
+                            });
+                            memoInput.addEventListener('blur', function() {
+                                // 포커스가 빠져나가도 키보드가 유지되도록
+                                setTimeout(() => this.focus(), 100);
+                            });
+                            memoInput.focus();
+                        }
+                    }, 300);
+                }
             }
         }
 
