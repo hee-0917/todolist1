@@ -483,6 +483,8 @@
         }
 
         .memo-container {
+            position: relative;
+            z-index: 1000;
             background-color: #fff;
             padding: 10px;
             border-radius: 4px;
@@ -500,6 +502,8 @@
             background-color: #fff;
             -webkit-appearance: none;
             appearance: none;
+            position: relative;
+            z-index: 1001;
         }
 
         .memo-actions {
@@ -542,16 +546,22 @@
                 font-size: 16px;
                 padding: 15px;
                 height: 45px;
-            }
-
-            .memo-actions button {
-                height: 40px;
-                font-size: 14px;
-                min-width: 80px;
+                -webkit-user-select: text;
+                user-select: text;
+                -webkit-tap-highlight-color: transparent;
             }
 
             .memo-container {
                 padding: 15px;
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+            }
+
+            /* 입력 중일 때 스타일 */
+            .memo-input:focus {
+                outline: none;
+                border-color: #3498db;
+                box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
             }
         }
     </style>
@@ -877,13 +887,20 @@
                     </button>
                     
                     ${task.showMemo ? `
-                        <div class="memo-container" onclick="event.stopPropagation()">
+                        <div class="memo-container" 
+                            onclick="event.stopPropagation()"
+                            ontouchstart="event.stopPropagation()"
+                            ontouchend="event.stopPropagation()">
                             <input type="text" 
                                 class="memo-input"
                                 id="memo-${task.id}"
                                 value="${task.memo || ''}"
                                 placeholder="메모를 입력하세요"
-                                onkeyup="handleMemoInput(event, ${task.id}, '${status}')"
+                                onclick="event.stopPropagation()"
+                                ontouchstart="event.stopPropagation()"
+                                ontouchend="event.stopPropagation()"
+                                onfocus="handleMemoFocus(event)"
+                                onblur="handleMemoBlur(event)"
                             />
                             <div class="memo-actions">
                                 <button class="memo-save-btn" 
@@ -984,18 +1001,30 @@
             renderTasks();
 
             if (task.showMemo) {
-                // 모바일 환경에서 입력 포커스 및 키보드 표시 강제
-                const memoInput = document.getElementById(`memo-${id}`);
-                if (memoInput) {
-                    // 입력 필드를 클릭 가능한 상태로 만들기
-                    memoInput.removeAttribute('readonly');
-                    
-                    // 강제로 포커스 설정 및 키보드 표시
-                    setTimeout(() => {
-                        memoInput.click();
+                // 포커스 및 키보드 유지를 위한 처리
+                setTimeout(() => {
+                    const memoInput = document.getElementById(`memo-${id}`);
+                    if (memoInput) {
                         memoInput.focus();
-                    }, 100);
-                }
+                        
+                        // 포커스 유지를 위한 이벤트 리스너 추가
+                        memoInput.addEventListener('blur', function preventBlur(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            memoInput.focus();
+                        });
+                        
+                        // 터치 이벤트 처리
+                        memoInput.addEventListener('touchstart', function(e) {
+                            e.stopPropagation();
+                        });
+                        
+                        memoInput.addEventListener('touchend', function(e) {
+                            e.stopPropagation();
+                            memoInput.focus();
+                        });
+                    }
+                }, 100);
             }
         }
 
@@ -1275,6 +1304,26 @@
             // Firebase에서 데이터 로드
             loadTasks();
         });
+
+        // 포커스 관련 핸들러 추가
+        function handleMemoFocus(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const input = event.target;
+            
+            // 스크롤 위치 조정
+            setTimeout(() => {
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
+        function handleMemoBlur(event) {
+            event.preventDefault();
+            const input = event.target;
+            setTimeout(() => {
+                input.focus();
+            }, 10);
+        }
     </script>
 </body>
 </html>
