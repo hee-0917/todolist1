@@ -477,14 +477,17 @@
         }
 
         /* 메모 관련 스타일 수정 */
+        .memo-section {
+            width: 100%;
+            margin-top: 8px;
+        }
+
         .memo-container {
-            margin-top: 10px;
-            display: none;
-            background-color: #f8f9fa;
+            background-color: #fff;
             padding: 10px;
             border-radius: 4px;
-            position: relative;
-            z-index: 100;
+            margin-top: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .memo-input {
@@ -492,26 +495,11 @@
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            min-height: 100px;
             font-size: 16px;
-            resize: vertical;
             margin-bottom: 8px;
+            background-color: #fff;
             -webkit-appearance: none;
-            -moz-appearance: none;
             appearance: none;
-            background-color: white;
-            z-index: 1000;
-            position: relative;
-        }
-
-        .memo-text {
-            background: #fff;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 8px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            color: #333;
         }
 
         .memo-actions {
@@ -520,384 +508,51 @@
             justify-content: flex-end;
         }
 
+        .memo-save-btn,
+        .memo-cancel-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         .memo-save-btn {
             background-color: #27ae60;
+            color: white;
         }
 
         .memo-cancel-btn {
             background-color: #95a5a6;
+            color: white;
         }
 
-        /* 모바일 대응 */
+        .memo-text {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        /* 모바일 최적화 */
         @media (max-width: 768px) {
             .memo-input {
                 font-size: 16px;
-                padding: 12px;
-                min-height: 120px;
-                -webkit-user-select: text;
-                user-select: text;
-            }
-            
-            .memo-container {
-                position: relative;
-                z-index: 1000;
-            }
-        }
-
-        /* 작업 목록 영역 */
-        .tasks-container {
-            margin-top: 10px;  /* 입력창과의 간격 */
-            overflow-y: auto;  /* 스크롤 가능하도록 */
-        }
-
-        /* 모바일 최적화 스타일 */
-        @media screen and (max-width: 768px) {
-            /* 전체 레이아웃 */
-            .board {
-                flex-direction: column;
-                padding: 10px;
-                gap: 20px;
-            }
-
-            .column {
-                width: 100%;
-                min-width: unset;
-                margin: 0;
-            }
-
-            /* 제목 */
-            h1 {
-                font-size: 24px;
-                margin: 15px 0;
-            }
-
-            h2 {
-                font-size: 18px;
-                margin: 10px 0;
-            }
-
-            /* 입력 영역 */
-            .task-input {
-                flex-direction: column;
-                gap: 8px;
-                padding: 10px;
-            }
-
-            .task-input input[type="text"],
-            .task-input input[type="date"] {
-                width: 100%;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .task-input button {
-                width: 100%;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            /* 작업 아이템 */
-            .task {
-                padding: 10px;
-                margin-bottom: 8px;
-            }
-
-            .task-content {
-                font-size: 14px;
-                margin-bottom: 8px;
-            }
-
-            .task-date {
-                font-size: 12px;
-                display: block;
-                margin-top: 4px;
-            }
-
-            /* 작업 버튼 영역 */
-            .task-actions {
-                display: flex;
-                flex-wrap: nowrap;  /* 한 줄로 강제 */
-                gap: 2px;          /* 버튼 간격 축소 */
-                justify-content: space-between; /* 버튼 간격 균등 분배 */
-            }
-
-            .task-actions button {
-                flex: 1;           /* 균등 분배 */
-                font-size: 11px;   /* 글자 크기 축소 */
-                padding: 4px 2px;  /* 패딩 축소 */
-                height: 28px;      /* 높이 축소 */
-                min-width: 0;      /* 최소 너비 제거 */
-                width: auto;       /* 가로 크기 자동 */
-                white-space: nowrap;
-            }
-
-            /* 버튼 텍스트 축소 */
-            .move-btn[onclick*="progress"] {
-                font-size: 11px;
-            }
-
-            /* 메모 버튼 */
-            .memo-btn, .edit-btn, .delete-btn, .move-btn { 
-                width: auto;  /* 가로 크기 자동으로 변경 */
-                min-width: 0; /* 최소 너비 제거 */
-            }
-
-            /* 메모 영역 */
-            .memo-container {
-                margin-top: 8px;
-            }
-
-            .memo-input {
-                width: 100%;
-                min-height: 60px;
-                font-size: 14px;
-                padding: 8px;
-            }
-
-            .memo-actions {
-                gap: 8px;
-                margin-top: 8px;
+                padding: 15px;
+                height: 45px;
             }
 
             .memo-actions button {
-                height: 32px;
-                font-size: 12px;
-                padding: 0 12px;
-            }
-
-            .memo-text {
-                font-size: 13px;
-                padding: 8px;
-                margin-top: 8px;
-            }
-
-            /* 전체목록 버튼 */
-            .view-all-btn {
+                height: 40px;
                 font-size: 14px;
-                height: 36px;
-                margin: 10px 0;
+                min-width: 80px;
             }
 
-            /* 모달 */
-            .modal-content {
-                width: 90%;
-                max-height: 80vh;
+            .memo-container {
                 padding: 15px;
             }
-
-            .modal-header {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-
-            .modal-header h2 {
-                text-align: center;
-            }
-
-            .modal-header button {
-                width: 100%;
-                height: 36px;
-                font-size: 14px;
-            }
-        }
-
-        /* 더 작은 화면에 대한 추가 최적화 */
-        @media screen and (max-width: 375px) {
-            .task-actions button {
-                font-size: 10px;   /* 더 작은 화면에서 글자 크기 추가 축소 */
-                padding: 4px 1px;  /* 패딩 추가 축소 */
-                height: 24px;      /* 높이 축소 */
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            h2 {
-                font-size: 16px;
-            }
-        }
-
-        /* 비활성화된 버튼 스타일 */
-        button:disabled {
-            cursor: not-allowed;
-            background-color: #cccccc;
-        }
-
-        /* 활성화된 버튼 스타일 */
-        button:enabled {
-            cursor: pointer;
-            opacity: 1 !important;
-        }
-
-        /* 비밀번호 입력 필드 포커스 스타일 */
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #2980b9;
-            box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
-        }
-
-        /* 로그인 관련 스타일 */
-        .password-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            color: white;
-            background-color: #cccccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-        }
-
-        .login-btn:not(:disabled) {
-            background-color: #2980b9;
-            cursor: pointer;
-            opacity: 1;
-        }
-
-        .login-btn:not(:disabled):hover {
-            background-color: #2471a3;
-        }
-
-        /* 상단 버튼 컨테이너 스타일 수정 */
-        .top-buttons {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 900; /* 모달보다 낮은 z-index 설정 */
-        }
-
-        /* 상단 버튼 스타일 */
-        .change-password-btn,
-        .logout-btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .change-password-btn {
-            background-color: #2980b9;
-        }
-
-        .logout-btn {
-            background-color: #dc3545;
-        }
-
-        /* 모달 오버레이 스타일 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999; /* 버튼보다 위, 모달보다 아래 */
-        }
-
-        /* 모달 애니메이션 */
-        .modal.show .modal-content {
-            animation: modalSlideUp 0.3s ease-out forwards;
-        }
-
-        @keyframes modalSlideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* 비밀번호 변경 모달 스타일 수정 */
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: #333;
-        }
-
-        .password-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .change-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            color: white;
-            background-color: #2980b9;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .change-btn:disabled {
-            background-color: #cccccc !important;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .modal-footer {
-            text-align: center;
-            padding-top: 20px;
-        }
-
-        /* 터치 이벤트 최적화 */
-        .memo-input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
         }
     </style>
     <!-- Firebase SDK -->
@@ -1214,6 +869,39 @@
                     break;
             }
 
+            const memoSection = `
+                <div class="memo-section">
+                    <button class="memo-btn" 
+                        onclick="toggleMemo(${task.id}, '${status}', event)">
+                        ${task.showMemo ? '메모 닫기' : '메모'}
+                    </button>
+                    
+                    ${task.showMemo ? `
+                        <div class="memo-container" onclick="event.stopPropagation()">
+                            <input type="text" 
+                                class="memo-input"
+                                id="memo-${task.id}"
+                                value="${task.memo || ''}"
+                                placeholder="메모를 입력하세요"
+                                onkeyup="handleMemoInput(event, ${task.id}, '${status}')"
+                            />
+                            <div class="memo-actions">
+                                <button class="memo-save-btn" 
+                                    onclick="saveMemo(${task.id}, '${status}', event)">
+                                    저장
+                                </button>
+                                <button class="memo-cancel-btn" 
+                                    onclick="cancelMemo(${task.id}, '${status}', event)">
+                                    취소
+                                </button>
+                            </div>
+                        </div>
+                    ` : task.memo ? `
+                        <div class="memo-text">${task.memo}</div>
+                    ` : ''}
+                </div>
+            `;
+
             return `
                 <div class="task">
                     <div class="task-content">
@@ -1221,28 +909,11 @@
                         ${task.dueDate ? `<span class="task-date">기한: ${task.dueDate}</span>` : ''}
                     </div>
                     <div class="task-actions">
-                        <button class="memo-btn" onclick="toggleMemo(${task.id}, '${status}')">
-                            ${task.showMemo ? '메모 닫기' : '메모'}
-                        </button>
+                        ${memoSection}
                         <button class="edit-btn" onclick="editTask(${task.id}, '${status}')">수정</button>
                         <button class="delete-btn" onclick="deleteTask(${task.id}, '${status}')">삭제</button>
                         ${moveButtons}
                     </div>
-                    <div class="memo-container" style="display: ${task.showMemo ? 'block' : 'none'}" onclick="event.stopPropagation()">
-                        <textarea class="memo-input" id="memo-${task.id}" 
-                            placeholder="메모를 입력하세요"
-                            autocomplete="off"
-                            autocorrect="off"
-                            autocapitalize="off"
-                            spellcheck="false"
-                            style="height: auto;"
-                            ontouchstart="event.stopPropagation()">${task.memo || ''}</textarea>
-                        <div class="memo-actions">
-                            <button class="memo-cancel-btn" onclick="cancelMemo(${task.id}, '${status}')">취소</button>
-                            <button class="memo-save-btn" onclick="saveMemo(${task.id}, '${status}')">저장</button>
-                        </div>
-                    </div>
-                    ${task.memo ? `<div class="memo-text">${task.memo.replace(/\n/g, '<br>')}</div>` : ''}
                 </div>
             `;
         }
@@ -1298,68 +969,75 @@
         });
 
         // 메모 관련 함수들 수정
-        function toggleMemo(id, status) {
-            console.log('Toggle memo:', id, status);
-            const taskIndex = tasks[status].findIndex(task => task.id === id);
-            if (taskIndex !== -1) {
-                tasks[status][taskIndex].showMemo = !tasks[status][taskIndex].showMemo;
-                renderTasks();
-                
-                if (tasks[status][taskIndex].showMemo) {
-                    setTimeout(() => {
-                        const memoInput = document.getElementById(`memo-${id}`);
-                        if (memoInput) {
-                            // 이벤트 버블링 방지
-                            memoInput.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                            });
-                            
-                            // 모바일 키보드 강제 표시
-                            memoInput.readOnly = false;
-                            memoInput.focus();
-                            
-                            // 커서를 텍스트 끝으로 이동
-                            const length = memoInput.value.length;
-                            memoInput.setSelectionRange(length, length);
-                        }
-                    }, 300); // 시간을 좀 더 늘림
-                }
+        function toggleMemo(id, status, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
             }
-        }
-
-        function saveMemo(id, status) {
-            console.log('Save memo:', id, status);
+            
             const taskIndex = tasks[status].findIndex(task => task.id === id);
-            if (taskIndex !== -1) {
+            if (taskIndex === -1) return;
+
+            const task = tasks[status][taskIndex];
+            task.showMemo = !task.showMemo;
+            
+            renderTasks();
+
+            if (task.showMemo) {
+                // 모바일 환경에서 입력 포커스 및 키보드 표시 강제
                 const memoInput = document.getElementById(`memo-${id}`);
                 if (memoInput) {
-                    const memoText = memoInput.value.trim();
-                    tasks[status][taskIndex].memo = memoText;
-                    tasks[status][taskIndex].showMemo = false;
+                    // 입력 필드를 클릭 가능한 상태로 만들기
+                    memoInput.removeAttribute('readonly');
                     
-                    // Firebase 저장 시도
-                    saveTasks()
-                        .then(() => {
-                            console.log('메모가 성공적으로 저장되었습니다.');
-                            renderTasks();
-                        })
-                        .catch((error) => {
-                            console.error('메모 저장 중 오류 발생:', error);
-                            // 로컬 스토리지에 백업
-                            localStorage.setItem('tasks', JSON.stringify(tasks));
-                            renderTasks();
-                        });
+                    // 강제로 포커스 설정 및 키보드 표시
+                    setTimeout(() => {
+                        memoInput.click();
+                        memoInput.focus();
+                    }, 100);
                 }
             }
         }
 
-        function cancelMemo(id, status) {
-            console.log('Cancel memo:', id, status);
-            const taskIndex = tasks[status].findIndex(task => task.id === id);
-            if (taskIndex !== -1) {
-                tasks[status][taskIndex].showMemo = false;
-                renderTasks();
+        // 메모 입력 처리 함수 추가
+        function handleMemoInput(event, id, status) {
+            if (event.key === 'Enter') {
+                saveMemo(id, status, event);
             }
+        }
+
+        // saveMemo 함수 수정
+        function saveMemo(id, status, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const memoInput = document.getElementById(`memo-${id}`);
+            if (!memoInput) return;
+
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex === -1) return;
+
+            const memoText = memoInput.value.trim();
+            tasks[status][taskIndex].memo = memoText;
+            tasks[status][taskIndex].showMemo = false;
+
+            saveTasks();
+        }
+
+        // cancelMemo 함수 수정
+        function cancelMemo(id, status, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const taskIndex = tasks[status].findIndex(task => task.id === id);
+            if (taskIndex === -1) return;
+
+            tasks[status][taskIndex].showMemo = false;
+            renderTasks();
         }
 
         // 새로운 태스크 추가
