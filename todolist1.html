@@ -567,12 +567,11 @@
 
         /* 상단 버튼 컨테이너 스타일 수정 */
         .top-buttons {
-            position: fixed;
-            top: 15px;
-            right: 15px;
             display: flex;
             gap: 10px;
-            z-index: 1000;
+            justify-content: flex-end;
+            padding: 10px 15px;
+            position: static;  /* 고정 해제 */
         }
 
         /* 상단 버튼 스타일 */
@@ -607,17 +606,29 @@
         /* 모바일 대응 */
         @media (max-width: 768px) {
             .top-buttons {
-                top: auto;
-                bottom: 20px;
-                right: 20px;
-                flex-direction: column;
+                position: static;
+                flex-direction: row;
+                padding: 10px;
+                margin-bottom: 10px;
             }
 
             .change-password-btn,
             .logout-btn {
-                padding: 10px 20px;
-                font-size: 16px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* 더 작은 화면에 대한 추가 최적화 */
+        @media (max-width: 375px) {
+            .top-buttons {
+                gap: 5px;
+            }
+
+            .change-password-btn,
+            .logout-btn {
+                padding: 6px 10px;
+                font-size: 12px;
             }
         }
     </style>
@@ -654,6 +665,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- 상단 버튼 그룹을 container 안의 맨 위로 이동 -->
+        <div class="top-buttons">
+            <button onclick="showPasswordChangeModal()" class="change-password-btn">비밀번호 변경</button>
+            <button onclick="logout()" class="logout-btn">로그아웃</button>
+        </div>
+        
         <h1>업무 리스트</h1>
         <div class="list-view-container">
             <button onclick="showTaskList()" class="list-view-btn">전체 목록 보기</button>
@@ -728,12 +745,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- 상단 버튼 그룹 -->
-    <div class="top-buttons">
-        <button onclick="showPasswordChangeModal()" class="change-password-btn">비밀번호 변경</button>
-        <button onclick="logout()" class="logout-btn">로그아웃</button>
     </div>
 
     <script>
